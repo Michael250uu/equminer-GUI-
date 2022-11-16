@@ -1,15 +1,15 @@
 #include "equminer.h"
-vector<Input *> input_vec;
-vector<Output *> output_vec;
-vector<Stdin_format *> std_vec;
-vector<Equminer *> equ_vec;
+vector<Input *> inputs;
+vector<Output *> outputs;
+vector<Stdin_format *> stds;
 
-string input_path; //path of INPUT directory
-string dir_path;   //path of current directory
-string dir_name;   //name of current directory
-string file_apath; //absolute path of current file
-string file_rpath; //relative path of current file
-string file_name;  //name of current file
+
+string input_path; 
+string dir_path;   
+string dir_name;  
+string file_apath; 
+string file_rpath;
+string file_name;  
 void generate_input()
 {
     const char *dir_path_name = dir_path.c_str();
@@ -21,7 +21,7 @@ void generate_input()
     else
     {
         dirent *curfile;
-        //Traverse files of CURRENT directory
+       
         while ((curfile = readdir(curdir_dir)) != NULL)
         {
             file_name = curfile->d_name;
@@ -30,15 +30,15 @@ void generate_input()
                 file_apath = dir_path + "/" + file_name;
                 file_rpath = "input/" + dir_name + "/" + file_name;
                 Input *curInput = new Input(file_name, file_apath, file_rpath, dir_path);
-                input_vec.push_back(curInput);
-                //cout<<file_name<<' '<<curfile_absolute_path<<' '<<curfile_relative_path<<endl;
+                inputs.push_back(curInput);
+                
             }
         }
         closedir(curdir_dir);
     }
 }
 
-void generate_stdin_format()
+void generate_stdin()
 {
     file_apath = dir_path + "/stdin_format.txt";
     ifstream in_file(file_apath);
@@ -53,9 +53,8 @@ void generate_stdin_format()
         while (in_file >> buffer)
         {
             int t, l, r;
-            switch (buffer[0])
-            {
-            case 'i':
+            
+            if(buffer[0]=='i')
             {
                 t = 1;
                 if (buffer[3] == '(')
@@ -79,18 +78,17 @@ void generate_stdin_format()
                     r = stoi(right_num);
                 }
                 else
-                    cout << "Error in stdin_format.txt!" << endl;
+                    cout << "Error " << endl;
 
-                break;
+                
             }
-            case 'c':
+            else if(buffer[0]=='c')
             {
                 t = 2;
                 l = 1;
-                r = 1;
-                break;
+                r = 1;  
             }
-            case 's':
+            else if(buffer[0]=='s')
             {
                 t = 2;
                 if (buffer[6] == '(')
@@ -117,18 +115,18 @@ void generate_stdin_format()
                 else
                     cout << "Error in stdin_format.txt!" << endl;
 
-                break;
+                
             }
-            default:
+            else
             {
                 cout << "Error in stdin_format.txt!" << endl;
-                break;
+                
             }
-            }
+            
             if (l <= r)
             {
                 Stdin_format *sf = new Stdin_format(t, l, r);
-                std_vec.push_back(sf);
+                stds.push_back(sf);
             }
             else
             {
@@ -148,16 +146,16 @@ int Stdin_format::get_right() { return right; }
 Equminer::Equminer() {}
 Equminer::Equminer(Input *i1, Input *i2, Output *o, vector<Stdin_format *> &st) : input1(i1), input2(i2), output(o), stf(st) {}
 
-string Equminer::random_case(int n) //Generate random test samples
+string Equminer::random_case(int n) 
 {
     int t = stf[n]->get_type();
     int rand_num = stf[n]->get_left() + rand() % (stf[n]->get_right() - stf[n]->get_left() + 1);
     if (t == 1)
-    { //int
+    {
         return to_string(rand_num);
     }
     else if (t == 2)
-    { //char or string
+    { 
         string str = "";
         char rand_char;
         for (int i = 0; i < rand_num; ++i)
@@ -168,19 +166,19 @@ string Equminer::random_case(int n) //Generate random test samples
         return str;
     }
 }
-void Equminer::case_compare() //Compare using test samples
+void Equminer::case_compare() 
 {
-    char creator1[1001] = "g++ -w -o a.out ";
-    strcat(creator1, input1->get_apath().c_str());
-    system(creator1);
+    char c1[1001] = "g++ -w -o a.out ";
+    strcat(c1, input1->get_apath().c_str());
+    system(c1);
 
-    char creator2[1001] = "g++ -w -o b.out ";
-    strcat(creator2, input2->get_apath().c_str());
-    system(creator2);
+    char c2[1001] = "g++ -w -o b.out ";
+    strcat(c2, input2->get_apath().c_str());
+    system(c2);
 
     
     for (int i = 0; i < 10; ++i)
-    { //10 times
+    { 
         string inputfile_path = input1->get_dpath() + "/input.txt";
         string outputfile_path1 = input1->get_dpath() + "/output1.txt";
         string outputfile_path2 = input2->get_dpath() + "/output2.txt";
@@ -188,11 +186,11 @@ void Equminer::case_compare() //Compare using test samples
         ofstream out_file;
         out_file.open(inputfile_path);
 
-        //a group of randomly generated samples
+       
         for (int j = 0; j < stf.size(); ++j)
         {
             out_file << random_case(j) << ' ';
-            //cout<<random_case(j)<<' ';
+            
         }
        
         out_file.close();
@@ -221,7 +219,7 @@ void Equminer::case_compare() //Compare using test samples
             continue;
         }
 
-        //read output of each file and compare
+        
         fstream in_file1;
         vector<string> res1;
         in_file1.open(outputfile_path1);
@@ -280,37 +278,12 @@ void Equminer::case_compare() //Compare using test samples
     output->set_equal(1);
     //cout<<endl;
 }
-void output_csv(){
-    //equal
-    ofstream out_file_equal;
-    out_file_equal.open("equal.csv");
-    out_file_equal<<"file1"<<','<<"file2"<<endl;
 
-    //inequal
-    ofstream out_file_inequal;
-    out_file_inequal.open("inequal.csv");
-    out_file_inequal<<"file1"<<','<<"file2"<<endl;
-    
-    for(int i = 0;i < output_vec.size();i++)
-    {
-        if(output_vec[i]->get_equal() == 0){
-            //inequal
-            out_file_inequal<<output_vec[i]->get_input1()->get_rpath()<<','<<output_vec[i]->get_input2()->get_rpath()<<endl;
-        }
-        else if(output_vec[i]->get_equal() == 1){
-            //equal
-            out_file_equal<<output_vec[i]->get_input1()->get_rpath()<<','<<output_vec[i]->get_input2()->get_rpath()<<endl;
-        }
-    }
-
-    out_file_equal.close();
-    out_file_inequal.close();
-}
 
 
 int main()
 {
-    //read path of INPUT
+    
     input_path = "/home/njucs/桌面/input";
     const char *input_path_name = input_path.c_str();
     DIR *input_dir = opendir(input_path_name);
@@ -321,46 +294,63 @@ int main()
     else
     {
         dirent *curdir;
-        //Traverse subfolders of INPUT
+        
         while ((curdir = readdir(input_dir)) != NULL)
         {
             dir_name = curdir->d_name;
             if (dir_name != ".vscode" && dir_name != "." && dir_name != "..")
             {
-                //generate Input and Stdin_format objects
+               
                 dir_path = input_path + "/" + dir_name;
-                //cout<<curdir_path<<endl;
+                
                 generate_input();
-                generate_stdin_format();
+                generate_stdin();
 
-                //generate Equminer and Output objects
-                //then compare each Input object, get results
-                //equminer_test();
-                for (int i = 0; i < input_vec.size() - 1; ++i)
+                
+                for (int i = 0; i < inputs.size() - 1; ++i)
                 {
-                    for (int j = i + 1; j < input_vec.size(); ++j)
+                    for (int j = i + 1; j < inputs.size(); ++j)
                     {
-                        //generate Output objects
-                        Output *op = new Output(input_vec[i], input_vec[j]);
-                        output_vec.push_back(op);
+                        
+                        Output *op = new Output(inputs[i], inputs[j]);
+                        outputs.push_back(op);
 
-                        //generate Equminer objects
-                        Equminer *eq = new Equminer(input_vec[i], input_vec[j], op, std_vec);
-                        equ_vec.push_back(eq);
-
-                        //random test
+                        Equminer *eq = new Equminer(inputs[i], inputs[j], op, stds);
+                        
                         eq->case_compare();
                     }
                 }
-                //empty input and stdin vector, for next directory
-                input_vec.clear();
-                std_vec.clear();
+               
+                inputs.clear();
+                stds.clear();
             }
         }
         closedir(input_dir);
     }
 
     //output results
-    output_csv();
+    ofstream out_file_equal;
+    out_file_equal.open("equal.csv");
+    out_file_equal<<"file1"<<','<<"file2"<<endl;
+
+    //inequal
+    ofstream out_file_inequal;
+    out_file_inequal.open("inequal.csv");
+    out_file_inequal<<"file1"<<','<<"file2"<<endl;
+    
+    for(int i = 0;i < outputs.size();i++)
+    {
+        if(outputs[i]->get_equal() == 0)
+            
+            out_file_inequal<<outputs[i]->get_input1()->get_rpath()<<','<<outputs[i]->get_input2()->get_rpath()<<endl;
+        
+        else 
+            
+            out_file_equal<<outputs[i]->get_input1()->get_rpath()<<','<<outputs[i]->get_input2()->get_rpath()<<endl;
+        
+    }
+
+    out_file_equal.close();
+    out_file_inequal.close();
     return 0;
 }

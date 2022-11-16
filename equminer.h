@@ -30,6 +30,6 @@ public:
     Equminer();
     Equminer(Input* i1,Input* i2,Output* o,vector<Stdin_format*> &st);
 
-    string random_case(int n);      //Generate random test samples
-    void case_compare();            //Compare using test samples
+    string random_case(int n);     
+    void case_compare();           
 };
