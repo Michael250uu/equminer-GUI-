@@ -1,4 +1,5 @@
-#pragma once
+#ifndef INPUT_H
+#define INPUT_H
 #include <string.h>
 #include <iostream>
 using namespace std;
@@ -19,3 +20,4 @@ public:
     string get_rpath();
     string get_dpath();
 };
+#endif // INPUT_H

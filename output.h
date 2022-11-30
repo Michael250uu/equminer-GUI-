@@ -1,3 +1,5 @@
+#ifndef OUTPUT_H
+#define OUTPUT_H
 #pragma once
 #include <string.h>
 #include <iostream>
@@ -18,3 +20,4 @@ public:
     bool get_equal();
     void set_equal(bool r);
 };
+#endif // OUTPUT_H

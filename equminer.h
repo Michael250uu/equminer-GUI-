@@ -1,4 +1,5 @@
-#pragma once
+#ifndef EQUMINER_H
+#define EQUMINER_H
 #include"output.h"
 #include<vector>
 #include <dirent.h>
@@ -30,6 +31,8 @@ public:
     Equminer();
     Equminer(Input* i1,Input* i2,Output* o,vector<Stdin_format*> &st);
 
-    string random_case(int n);     
-    void case_compare();           
+    string random_case(int n);
+    void case_compare();
 };
+
+#endif // EQUMINER_H
