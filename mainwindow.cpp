@@ -394,5 +394,5 @@ void MainWindow::manual_judge()
     for(int i = 0;i<redl.size();++i)
         ui->listWidget->item(redl[i])->setForeground(QColor("red"));
     for(int i = 0;i<redr.size();++i)
-        ui->listWidget_2->item(redr[i])->setForeground(QColor("red"));
+        ui->listWidget_2->item(redr[i])->setForeground(QColor("green"));
 }
